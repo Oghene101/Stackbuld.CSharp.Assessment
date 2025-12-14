@@ -1,0 +1,33 @@
+using MediatR;
+using Stackbuld.Assessment.CSharp.Application.Common.Contracts;
+using Stackbuld.Assessment.CSharp.Application.Common.Contracts.Abstractions.Repositories;
+using Stackbuld.Assessment.CSharp.Application.Common.Filters;
+using Stackbuld.Assessment.CSharp.Application.Extensions;
+using GetProductsResponse = Stackbuld.Assessment.CSharp.Application.Common.Contracts.Product.GetProductsResponse;
+
+namespace Stackbuld.Assessment.CSharp.Application.Features.Product.Queries;
+
+public static class GetProducts
+{
+    public record Query(
+        PaginationFilter PaginationFilter,
+        DateRangeFilter DateRangeFilter) : IRequest<Result<PaginatorVm<IEnumerable<GetProductsResponse>>>>;
+
+    public class Handler(
+        IUnitOfWork uOw) : IRequestHandler<Query, Result<PaginatorVm<IEnumerable<GetProductsResponse>>>>
+    {
+        public async Task<Result<PaginatorVm<IEnumerable<GetProductsResponse>>>> Handle(
+            Query request, CancellationToken cancellationToken)
+        {
+            var pageNumber = request.PaginationFilter.PageNumber;
+            var pageSize = request.PaginationFilter.PageSize;
+            var startDate = request.DateRangeFilter.EffectiveStartDate;
+            var endDate = request.DateRangeFilter.EffectiveEndDate;
+
+            var (products, totalCount) =
+                await uOw.ProductsReadRepository.GetProductsAsync(pageNumber, pageSize, startDate, endDate);
+
+            return products.ToVm(totalCount, pageNumber, pageSize);
+        }
+    }
+}
