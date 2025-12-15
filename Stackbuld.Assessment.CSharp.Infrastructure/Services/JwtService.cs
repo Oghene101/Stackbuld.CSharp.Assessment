@@ -18,7 +18,8 @@ public class JwtService(
 {
     private readonly JwtSettings _jwt = jwt.Value;
 
-    public async Task<Application.Common.Contracts.Services.Jwt.GenerateTokenResponse> GenerateToken(Application.Common.Contracts.Services.Jwt.GenerateTokenRequest request,
+    public async Task<Application.Common.Contracts.Services.Jwt.GenerateTokenResponse> GenerateToken(
+        Application.Common.Contracts.Services.Jwt.GenerateTokenRequest request,
         CancellationToken cancellationToken = default)
     {
         var (user, roles) = request;
@@ -54,7 +55,7 @@ public class JwtService(
 
         var refreshToken = new RefreshToken
         {
-            Token = GenerateRefreshToken(),
+            TokenHash = GenerateRefreshToken(),
             ExpiresAt = DateTimeOffset.UtcNow.AddDays(_jwt.RefreshTokenExpireDays),
             UserId = user.Id,
             CreatedBy = $"{user.FirstName} {user.LastName}",
@@ -65,7 +66,8 @@ public class JwtService(
 
         var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-        return new Application.Common.Contracts.Services.Jwt.GenerateTokenResponse(accessToken, _jwt.ExpireMinutes, refreshToken.Token);
+        return new Application.Common.Contracts.Services.Jwt.GenerateTokenResponse(accessToken, _jwt.ExpireMinutes,
+            refreshToken.TokenHash);
     }
 
     private static string GenerateRefreshToken()

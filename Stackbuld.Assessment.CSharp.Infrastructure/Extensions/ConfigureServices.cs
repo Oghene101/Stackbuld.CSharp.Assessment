@@ -16,7 +16,6 @@ using Stackbuld.Assessment.CSharp.Domain.Entities;
 using Stackbuld.Assessment.CSharp.Infrastructure.Configurations;
 using Stackbuld.Assessment.CSharp.Infrastructure.Persistence;
 using Stackbuld.Assessment.CSharp.Infrastructure.Persistence.DbContexts;
-using Stackbuld.Assessment.CSharp.Infrastructure.Persistence.Repositories;
 using Stackbuld.Assessment.CSharp.Infrastructure.Services;
 
 namespace Stackbuld.Assessment.CSharp.Infrastructure.Extensions;
@@ -109,8 +108,8 @@ public static class ConfigureServices
     {
         services.AddMemoryCache();
         services.AddHttpContextAccessor();
-        // services.AddHostedService<QueuedHostedService>();
-        // services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+        services.AddHostedService<QueuedHostedService>();
+        services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
         services.AddSingleton<IEncryptionProvider, AesEncryptionProvider>();
         services.AddSingleton<IEmailTemplates, EmailTemplates>();
         services.AddScoped<IUtilityService, UtilityService>();

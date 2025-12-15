@@ -1,4 +1,6 @@
+using Stackbuld.Assessment.CSharp.Application.Common.Contracts;
 using Stackbuld.Assessment.CSharp.Application.Common.Filters;
+using Stackbuld.Assessment.CSharp.Application.Features.Auth.Commands;
 using Stackbuld.Assessment.CSharp.Application.Features.Cart.Commands;
 using Stackbuld.Assessment.CSharp.Application.Features.Merchant.Queries;
 using Stackbuld.Assessment.CSharp.Application.Features.Product.Commands;
@@ -10,12 +12,25 @@ using UpdateProductRequest = Stackbuld.Assessment.CSharp.Application.Common.Cont
 using GetProductsRequest = Stackbuld.Assessment.CSharp.Application.Common.Contracts.Product.GetProductsRequest;
 using GetProductByIdResponse = Stackbuld.Assessment.CSharp.Application.Common.Contracts.Product.GetProductByIdResponse;
 using GetProductsResponse = Stackbuld.Assessment.CSharp.Application.Common.Contracts.Product.GetProductsResponse;
+using Product = Stackbuld.Assessment.CSharp.Domain.Entities.Product;
 
 namespace Stackbuld.Assessment.CSharp.Application.Extensions;
 
 public static class Mappers
 {
     #region To Entity
+
+    public static User ToEntity(this SignUp.Command dto)
+        => new()
+        {
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Email = dto.Email,
+            UserName = dto.Email,
+            CreatedBy = $"{dto.FirstName} {dto.LastName}",
+            UpdatedBy = $"{dto.FirstName} {dto.LastName}"
+        };
+
 
     public static Product ToEntity(this CreateProduct.Command dto, Guid merchantId)
         => new()
@@ -38,6 +53,9 @@ public static class Mappers
     #endregion
 
     #region To Command
+
+    public static SignUp.Command ToCommand(this Auth.SignUpRequest dto)
+        => new(dto.FirstName, dto.LastName, dto.Email, dto.Password);
 
     public static CreateProduct.Command ToCommand(this CreateProductRequest dto)
         => new(dto.Name, dto.Description, dto.Price, dto.StockQuantity);
