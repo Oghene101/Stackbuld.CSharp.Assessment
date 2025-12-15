@@ -26,7 +26,6 @@ public static class DeleteProduct
             uOw.ProductsWriteRepository.Update(product, x => x.IsDeleted);
             await uOw.SaveChangesAsync(cancellationToken);
 
-
             return Result.Success(request.Id);
         }
     }

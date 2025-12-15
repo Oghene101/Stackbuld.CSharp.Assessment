@@ -13,12 +13,13 @@ public class CartEndpoints : IEndpoint
 {
     public void MapEndpoints(IEndpointRouteBuilder app)
     {
-        // GET    /api/cart              → View cart / summary
-        // POST   /api/cart/add          → Add item
-        // DELETE /api/cart/remove/{id}  → Remove item
-        // POST   /api/cart/checkout     → Create order
-
         var group = app.MapGroup("api/cart").WithTags("Cart");
+
+        group.MapGet("", GetCartByUserIdAsync)
+            .WithName("GetCartByUserId")
+            .WithSummary("Get cart")
+            .WithDescription("Returns the signed-in user's cart.")
+            .RequireAuthorization();
 
         group.MapPost("add/{productId:guid}", AddToCartAsync)
             .WithName("AddToCart")
@@ -27,10 +28,10 @@ public class CartEndpoints : IEndpoint
                 "Adds a product to the signed-in user's cart with the desired quantity.")
             .RequireAuthorization();
 
-        group.MapGet("", GetCartByUserIdAsync)
-            .WithName("GetCartByUserId")
-            .WithSummary("Get cart")
-            .WithDescription("Returns the signed-in user's cart.")
+        group.MapDelete("remove/{cartItemId:guid}", RemoveCartItemAsync)
+            .WithName("RemoveCartItem")
+            .WithSummary("Remove item from cart")
+            .WithDescription("Removes a specific item from the signed-in user's cart.")
             .RequireAuthorization();
 
         group.MapPost("checkout", CheckoutCartAsync)
@@ -58,6 +59,16 @@ public class CartEndpoints : IEndpoint
     {
         var result = await sender.Send(new GetCartByUserId.Query(), cancellationToken);
         var apiResponse = ApiResponse.Success(result.Value);
+
+        return TypedResults.Ok(apiResponse);
+    }
+
+    private static async Task<Results<Ok<ApiResponse<Guid>>, BadRequest<ProblemDetails>>> RemoveCartItemAsync(
+        Guid cartItemId,
+        ISender sender, CancellationToken cancellationToken = default)
+    {
+        Guid result = await sender.Send(new RemoveCartItem.Command(cartItemId), cancellationToken);
+        var apiResponse = ApiResponse.Success(result);
 
         return TypedResults.Ok(apiResponse);
     }

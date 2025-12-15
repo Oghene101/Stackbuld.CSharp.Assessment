@@ -8,7 +8,7 @@ public interface IRepository<TEntity> where TEntity : EntityBase
     Task<TEntity?> FindAsync(object id, CancellationToken cancellationToken = default);
     Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
     void Update(TEntity entity, params Expression<Func<TEntity, object>>[] updatedProperties);
+    Task RemoveAsync(object id, CancellationToken cancellationToken = default);
     void Remove(TEntity entity);
-
     void RemoveRange(IEnumerable<TEntity> entities);
 }
