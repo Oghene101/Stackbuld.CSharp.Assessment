@@ -34,7 +34,7 @@ public static class Mappers
             CartId = cartId,
             ProductId = dto.Id,
         };
-    
+
     #endregion
 
     #region To Command
@@ -90,6 +90,29 @@ public static class Mappers
 
         return new PaginatorVm<IEnumerable<GetProductsResponse>>(pageSize, pageNumber,
             totalPages, totalCount, getProductsResponses);
+    }
+
+    public static Cart.GetCartByUserIdResponse ToVm(
+        this Domain.Entities.Cart dto, Dictionary<Guid, Product> products)
+    {
+        var cartItems = dto.CartItems.Select(x =>
+        {
+            var product = products[x.ProductId];
+            return new Cart.CartItemVm
+            (
+                x.Id,
+                x.ProductId,
+                product.Name,
+                product.Price,
+                x.Quantity
+            );
+        }).ToArray();
+
+        return new Cart.GetCartByUserIdResponse
+        (
+            dto.Id,
+            cartItems
+        );
     }
 
     #endregion

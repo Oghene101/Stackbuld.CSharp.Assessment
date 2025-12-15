@@ -27,13 +27,13 @@ public class CartEndpoints : IEndpoint
                 "Adds a product to the signed-in user's cart with the desired quantity.")
             .RequireAuthorization();
 
-        group.MapGet("", GetCartAsync)
-            .WithName("GetCart")
+        group.MapGet("", GetCartByUserIdAsync)
+            .WithName("GetCartByUserId")
             .WithSummary("Get cart")
             .WithDescription("Returns the signed-in user's cart.")
             .RequireAuthorization();
 
-        group.MapGet("checkout", CheckoutCartAsync)
+        group.MapPost("checkout", CheckoutCartAsync)
             .WithName("Checkout")
             .WithSummary("Checkout cart")
             .WithDescription(
@@ -52,15 +52,17 @@ public class CartEndpoints : IEndpoint
         return TypedResults.Ok(apiResponse);
     }
 
-    private Task GetCartAsync(
-        HttpContext context,
-        ISender sender, CancellationToken cancellationToken = default)
+    private static async Task<Results<Ok<ApiResponse<Cart.GetCartByUserIdResponse>>, BadRequest<ProblemDetails>>>
+        GetCartByUserIdAsync(
+            ISender sender, CancellationToken cancellationToken = default)
     {
-        sender.Send(new GetCartByUserId.Query());
-        throw new NotImplementedException();
+        var result = await sender.Send(new GetCartByUserId.Query(), cancellationToken);
+        var apiResponse = ApiResponse.Success(result.Value);
+
+        return TypedResults.Ok(apiResponse);
     }
 
-    private static async Task<Results<Ok<ApiResponse<Guid>>, BadRequest<ValidationProblemDetails>>> CheckoutCartAsync(
+    private static async Task<Results<Ok<ApiResponse<Guid>>, BadRequest<ProblemDetails>>> CheckoutCartAsync(
         ISender sender, CancellationToken cancellationToken = default)
     {
         Guid result = await sender.Send(new CheckoutCart.Command(), cancellationToken);
