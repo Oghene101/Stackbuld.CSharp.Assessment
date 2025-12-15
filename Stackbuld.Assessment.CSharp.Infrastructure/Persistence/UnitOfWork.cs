@@ -10,22 +10,7 @@ using Stackbuld.Assessment.CSharp.Infrastructure.Persistence.Repositories;
 namespace Stackbuld.Assessment.CSharp.Infrastructure.Persistence;
 
 public class UnitOfWork(
-    AppDbContext context,
-    IRefreshTokenRepository refreshTokensReadRepository,
-    IRepository<RefreshToken> refreshTokensWriteRepository,
-    IKycVerificationRepository kycVerificationsReadRepository,
-    IRepository<KycVerification> kycVerificationsWriteRepository,
-    IAddressRepository addressesReadRepository,
-    IRepository<Address> addressesWriteRepository,
-    IProductRepository productsReadRepository,
-    IProductWriteRepository productsWriteRepository,
-    IMerchantRepository merchantsReadRepository,
-    IRepository<Merchant> merchantsWriteRepository,
-    ICartRepository cartsReadRepository,
-    IRepository<Cart> cartsWriteRepository,
-    IRepository<CartItem> cartItemsWriteRepository,
-    IRepository<Order> ordersWriteRepository
-    ) : IUnitOfWork, IAsyncDisposable
+    AppDbContext context) : IUnitOfWork, IAsyncDisposable
 {
     private IDbContextTransaction? _transaction;
     public IDbConnection DbConnection => context.Database.GetDbConnection();
@@ -35,55 +20,59 @@ public class UnitOfWork(
 
     #region RefreshTokens
 
-    public IRefreshTokenRepository RefreshTokensReadRepository => refreshTokensReadRepository;
-    public IRepository<RefreshToken> RefreshTokensWriteRepository => refreshTokensWriteRepository;
+    public IRefreshTokenRepository RefreshTokensReadRepository =>
+        new RefreshTokenRepository(DbConnection, DbTransaction);
+
+    public IRepository<RefreshToken> RefreshTokensWriteRepository => new Repository<RefreshToken>(context);
 
     #endregion
 
     #region KycVerifications
 
-    public IKycVerificationRepository KycVerificationsReadRepository => kycVerificationsReadRepository;
-    public IRepository<KycVerification> KycVerificationsWriteRepository => kycVerificationsWriteRepository;
+    public IKycVerificationRepository KycVerificationsReadRepository =>
+        new KycVerificationRepository(DbConnection, DbTransaction);
+
+    public IRepository<KycVerification> KycVerificationsWriteRepository => new Repository<KycVerification>(context);
 
     #endregion
 
     #region Addresses
 
-    public IAddressRepository AddressesReadRepository => addressesReadRepository;
-    public IRepository<Address> AddressesWriteRepository => addressesWriteRepository;
+    public IAddressRepository AddressesReadRepository => new AddressRepository(DbConnection, DbTransaction);
+    public IRepository<Address> AddressesWriteRepository => new Repository<Address>(context);
 
     #endregion
 
     #region Products
 
-    public IProductRepository ProductsReadRepository => productsReadRepository;
-    public IProductWriteRepository ProductsWriteRepository => productsWriteRepository;
+    public IProductRepository ProductsReadRepository => new ProductRepository(DbConnection, DbTransaction);
+    public IProductWriteRepository ProductsWriteRepository => new ProductWriteRepository(context);
 
     #endregion
 
     #region Merchants
 
-    public IMerchantRepository MerchantsReadRepository => merchantsReadRepository;
-    public IRepository<Merchant> MerchantsWriteRepository => merchantsWriteRepository;
+    public IMerchantRepository MerchantsReadRepository => new MerchantRepository(DbConnection, DbTransaction);
+    public IRepository<Merchant> MerchantsWriteRepository => new Repository<Merchant>(context);
 
     #endregion
 
     #region Carts
 
-    public ICartRepository CartsReadRepository => cartsReadRepository;
-    public IRepository<Cart> CartsWriteRepository => cartsWriteRepository;
+    public ICartRepository CartsReadRepository => new CartRepository(DbConnection, DbTransaction);
+    public IRepository<Cart> CartsWriteRepository => new Repository<Cart>(context);
 
     #endregion
-    
+
     #region CartIems
 
-    public IRepository<CartItem> CartItemsWriteRepository => cartItemsWriteRepository;
+    public IRepository<CartItem> CartItemsWriteRepository => new Repository<CartItem>(context);
 
     #endregion
-    
+
     #region Order
 
-    public IRepository<Order> OrdersWriteRepository => ordersWriteRepository;
+    public IRepository<Order> OrdersWriteRepository => new Repository<Order>(context);
 
     #endregion
 

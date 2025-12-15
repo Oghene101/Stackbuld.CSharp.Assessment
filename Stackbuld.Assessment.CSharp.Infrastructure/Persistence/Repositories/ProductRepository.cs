@@ -1,35 +1,36 @@
+using System.Data;
 using Dapper;
 using Stackbuld.Assessment.CSharp.Application.Common.Contracts.Abstractions.Repositories;
 using Stackbuld.Assessment.CSharp.Domain.Entities;
+using Stackbuld.Assessment.CSharp.Infrastructure.Persistence.DbContexts;
 
 namespace Stackbuld.Assessment.CSharp.Infrastructure.Persistence.Repositories;
 
 public class ProductRepository(
-    IUnitOfWork uOw) : IProductRepository
+    IDbConnection connection,
+    IDbTransaction? transaction) : IProductRepository
 {
     public async Task<Product?> GetProductByIdAsync(Guid id)
     {
-        var connection = uOw.DbConnection;
         var sql = """
                   SELECT * FROM "Products" 
                            WHERE "Id" = @id
                            AND "ISDELETED" = FALSE;
                   """;
 
-        var result = await connection.QueryFirstOrDefaultAsync<Product>(sql, new { id }, uOw.DbTransaction);
+        var result = await connection.QueryFirstOrDefaultAsync<Product>(sql, new { id }, transaction);
         return result;
     }
 
     public async Task<IEnumerable<Product>> GetProductsByIdsAsync(IEnumerable<Guid> ids)
     {
-        var connection = uOw.DbConnection;
         var sql = """
                   SELECT * FROM "Products" 
                            WHERE "Id" = ANY(@ids)
                            AND "ISDELETED" = FALSE;
                   """;
 
-        var result = await connection.QueryAsync<Product>(sql, new { ids }, uOw.DbTransaction);
+        var result = await connection.QueryAsync<Product>(sql, new { ids }, transaction);
         return result;
     }
 
@@ -41,8 +42,6 @@ public class ProductRepository(
         var parameters = new DynamicParameters();
         var whereClause = """ WHERE "MerchantId" = @MerchantId AND "IsDeleted" = false """;
         parameters.Add("MerchantId", merchantId);
-
-        var connection = uOw.DbConnection;
 
         if (startDate.HasValue && endDate.HasValue)
         {
@@ -67,7 +66,7 @@ public class ProductRepository(
                    {whereClause};
                    """;
 
-        await using var reader = await connection.QueryMultipleAsync(sql, parameters, uOw.DbTransaction);
+        await using var reader = await connection.QueryMultipleAsync(sql, parameters, transaction);
         var products = reader.Read<Product>();
         var totalCount = await reader.ReadSingleAsync<int>();
 
@@ -81,8 +80,6 @@ public class ProductRepository(
         var parameters = new DynamicParameters();
         var whereClause = """ WHERE 1=1 AND "IsDeleted" = false """;
 
-        var connection = uOw.DbConnection;
-
         if (startDate.HasValue && endDate.HasValue)
         {
             whereClause += """ AND "CreatedAt" >= @StartDate AND "CreatedAt" < @EndDate """;
@@ -106,7 +103,7 @@ public class ProductRepository(
                    {whereClause};
                    """;
 
-        await using var reader = await connection.QueryMultipleAsync(sql, parameters, uOw.DbTransaction);
+        await using var reader = await connection.QueryMultipleAsync(sql, parameters, transaction);
         var products = reader.Read<Product>();
         var totalCount = await reader.ReadSingleAsync<int>();
 

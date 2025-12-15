@@ -1,3 +1,4 @@
+using System.Data;
 using Dapper;
 using Stackbuld.Assessment.CSharp.Application.Common.Contracts.Abstractions;
 using Stackbuld.Assessment.CSharp.Application.Common.Contracts.Abstractions.Repositories;
@@ -6,11 +7,11 @@ using Stackbuld.Assessment.CSharp.Domain.Entities;
 namespace Stackbuld.Assessment.CSharp.Infrastructure.Persistence.Repositories;
 
 public class RefreshTokenRepository(
-    IUnitOfWork uOw) : IRefreshTokenRepository
+    IDbConnection connection,
+    IDbTransaction? transaction) : IRefreshTokenRepository
 {
     public async Task<RefreshToken?> GetRefreshTokenAsync(string token)
     {
-        var connection = uOw.DbConnection;
         var sql = """
                   SELECT * FROM "RefreshTokens" 
                            WHERE "Token" = @token
@@ -19,7 +20,7 @@ public class RefreshTokenRepository(
                            AND "ExpiresAt" > SWITCHOFFSET(SYSDATETIMEOFFSET(), '+00:00')
                   """;
 
-        var result = await connection.QuerySingleOrDefaultAsync<RefreshToken>(sql, new { token }, uOw.DbTransaction);
+        var result = await connection.QuerySingleOrDefaultAsync<RefreshToken>(sql, new { token }, transaction);
         return result;
     }
 }

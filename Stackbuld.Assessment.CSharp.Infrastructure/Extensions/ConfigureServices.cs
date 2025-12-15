@@ -118,14 +118,6 @@ public static class ConfigureServices
         services.AddScoped<IApiClient, ApiClient>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-        services.AddScoped<IAddressRepository, AddressRepository>();
-        services.AddScoped<ICartRepository, CartRepository>();
-        services.AddScoped<IKycVerificationRepository, KycVerificationRepository>();
-        services.AddScoped<IMerchantRepository, MerchantRepository>();
-        services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<IProductWriteRepository, ProductWriteRepository>();
-        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 
