@@ -38,8 +38,14 @@ public class AuthEndpoints : IEndpoint
         return TypedResults.Ok(apiResponse);
     }
 
-    private static Task MerchantSignUpAsync(HttpContext context)
+    private static async Task<Results<Ok<ApiResponse<Guid>>, BadRequest<ValidationProblemDetails>>> MerchantSignUpAsync(
+        Auth.SignUpMerchantRequest request,
+        ISender sender, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var command = request.ToCommand();
+        Guid result = await sender.Send(command, cancellationToken);
+        var apiResponse = ApiResponse.Success(result);
+
+        return TypedResults.Ok(apiResponse);
     }
 }

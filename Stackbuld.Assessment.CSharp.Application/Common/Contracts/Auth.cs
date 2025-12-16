@@ -4,6 +4,13 @@ public static class Auth
 {
     public record SignUpRequest(string FirstName, string LastName, string Email, string Password);
 
+    public record SignUpMerchantRequest(
+        string FirstName,
+        string LastName,
+        string Email,
+        string BusinessName,
+        string Password);
+
     public record ConfirmEmailRequest(string Email, string Token);
 
     public record SignInRequest(string Email, string Password);

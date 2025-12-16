@@ -31,6 +31,17 @@ public static class Mappers
             UpdatedBy = $"{dto.FirstName} {dto.LastName}"
         };
 
+    public static User ToEntity(this SignUpMerchant.Command dto)
+        => new()
+        {
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Email = dto.Email,
+            UserName = dto.Email,
+            CreatedBy = $"{dto.FirstName} {dto.LastName}",
+            UpdatedBy = $"{dto.FirstName} {dto.LastName}"
+        };
+
 
     public static Product ToEntity(this CreateProduct.Command dto, Guid merchantId)
         => new()
@@ -56,6 +67,9 @@ public static class Mappers
 
     public static SignUp.Command ToCommand(this Auth.SignUpRequest dto)
         => new(dto.FirstName, dto.LastName, dto.Email, dto.Password);
+
+    public static SignUpMerchant.Command ToCommand(this Auth.SignUpMerchantRequest dto)
+        => new(dto.FirstName, dto.LastName, dto.Email, dto.BusinessName, dto.Password);
 
     public static CreateProduct.Command ToCommand(this CreateProductRequest dto)
         => new(dto.Name, dto.Description, dto.Price, dto.StockQuantity);
