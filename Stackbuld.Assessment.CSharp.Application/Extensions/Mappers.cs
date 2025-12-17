@@ -87,6 +87,9 @@ public static class Mappers
     public static ForgotPassword.Command ToCommand(this Auth.ForgotPasswordRequest dto)
         => new(dto.Email);
 
+    public static ResetPassword.Command ToCommand(this Auth.ResetPasswordRequest dto)
+        => new(dto.Email, dto.Token, dto.NewPassword);
+
     public static CreateProduct.Command ToCommand(this CreateProductRequest dto)
         => new(dto.Name, dto.Description, dto.Price, dto.StockQuantity);
 

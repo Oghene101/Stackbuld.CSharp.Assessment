@@ -54,6 +54,12 @@ public class AuthEndpoints : IEndpoint
             .WithSummary("Request a password reset")
             .WithDescription("Sends a password reset link to the user’s registered email.")
             .AllowAnonymous();
+
+        group.MapPost("reset-password", ResetPasswordAsync)
+            .WithName("ResetPassword")
+            .WithSummary("Reset user password")
+            .WithDescription("Resets the user's password using a valid reset token from the forgot password flow.")
+            .AllowAnonymous();
     }
 
 
@@ -130,6 +136,18 @@ public class AuthEndpoints : IEndpoint
     private static async Task<Results<Ok<ApiResponse>, BadRequest<ValidationProblemDetails>>>
         ForgotPasswordAsync(
             Auth.ForgotPasswordRequest request,
+            ISender sender, CancellationToken cancellationToken)
+    {
+        var command = request.ToCommand();
+        string result = await sender.Send(command, cancellationToken);
+        var apiResponse = ApiResponse.Success(message: result);
+
+        return TypedResults.Ok(apiResponse);
+    }
+
+    private static async Task<Results<Ok<ApiResponse>, BadRequest<ValidationProblemDetails>>>
+        ResetPasswordAsync(
+            Auth.ResetPasswordRequest request,
             ISender sender, CancellationToken cancellationToken)
     {
         var command = request.ToCommand();
