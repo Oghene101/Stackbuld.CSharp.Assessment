@@ -13,7 +13,6 @@ public class ProductWriteRepository(
     {
         var rowsAffected = await DbSet
             .Where(p => p.Id == productId &&
-                        !p.IsDeleted &&
                         p.StockQuantity >= quantity)
             .ExecuteUpdateAsync(setters =>
                     setters.SetProperty(p => p.StockQuantity,

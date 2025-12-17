@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Stackbuld.Assessment.CSharp.Application.Common.Contracts;
 using Stackbuld.Assessment.CSharp.Application.Common.Contracts.Abstractions;
 using Stackbuld.Assessment.CSharp.Application.Common.Contracts.Abstractions.Repositories;
@@ -64,11 +63,12 @@ public static class CheckoutCart
                         ProductId = product.Id
                     });
 
-                    product.StockQuantity -= item.Quantity;
-                    uOw.ProductsWriteRepository.Update(product,
-                        x => x.StockQuantity);
-
-                    await uOw.ProductsWriteRepository.TryReduceStockAsync(product.Id, item.Quantity, cancellationToken);
+                    var sufficient =
+                        await uOw.ProductsWriteRepository.TryReduceStockAsync(product.Id, item.Quantity,
+                            cancellationToken);
+                    if (!sufficient)
+                        throw ApiException.BadRequest(new Error("Cart.Error",
+                            $"Insufficient stock for {product.Name}"));
                 }
 
                 await uOw.OrdersWriteRepository.AddAsync(order, cancellationToken);

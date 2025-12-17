@@ -41,6 +41,7 @@ app.UseMiddleware<TimingMiddleware>();
 app.UseExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHealthChecks("/health");
 app.MapEndpoints();
 
 await using var scope = app.Services.CreateAsyncScope();

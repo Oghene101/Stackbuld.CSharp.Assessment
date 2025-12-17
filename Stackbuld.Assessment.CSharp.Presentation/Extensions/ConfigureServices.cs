@@ -10,6 +10,7 @@ public static class ConfigureServices
         services.AddOpenApi(options => options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
+        services.AddHealthChecks();
 
         return services;
     }
@@ -30,3 +31,5 @@ public static class EndpointRegistrationExtensions
         }
     }
 }
+
+//todo: implement background service to ping application

@@ -2,7 +2,6 @@ using System.Data;
 using Dapper;
 using Stackbuld.Assessment.CSharp.Application.Common.Contracts.Abstractions.Repositories;
 using Stackbuld.Assessment.CSharp.Domain.Entities;
-using Stackbuld.Assessment.CSharp.Infrastructure.Persistence.DbContexts;
 
 namespace Stackbuld.Assessment.CSharp.Infrastructure.Persistence.Repositories;
 
@@ -15,7 +14,7 @@ public class ProductRepository(
         var sql = """
                   SELECT * FROM "Products" 
                            WHERE "Id" = @id
-                           AND "ISDELETED" = FALSE;
+                           AND "IsDeleted" = FALSE;
                   """;
 
         var result = await connection.QueryFirstOrDefaultAsync<Product>(sql, new { id }, transaction);
@@ -27,7 +26,7 @@ public class ProductRepository(
         var sql = """
                   SELECT * FROM "Products" 
                            WHERE "Id" = ANY(@ids)
-                           AND "ISDELETED" = FALSE;
+                           AND "IsDeleted" = FALSE;
                   """;
 
         var result = await connection.QueryAsync<Product>(sql, new { ids }, transaction);

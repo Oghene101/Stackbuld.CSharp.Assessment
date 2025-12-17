@@ -1,6 +1,5 @@
 using System.Data;
 using Dapper;
-using Stackbuld.Assessment.CSharp.Application.Common.Contracts.Abstractions;
 using Stackbuld.Assessment.CSharp.Application.Common.Contracts.Abstractions.Repositories;
 using Stackbuld.Assessment.CSharp.Domain.Entities;
 
@@ -14,10 +13,10 @@ public class RefreshTokenRepository(
     {
         var sql = """
                   SELECT * FROM "RefreshTokens" 
-                           WHERE "Token" = @token
+                           WHERE "TokenHash" = @token
                            AND "IsRevoked" = 0
                            AND "IsUsed" = 0
-                           AND "ExpiresAt" > SWITCHOFFSET(SYSDATETIMEOFFSET(), '+00:00')
+                           AND "ExpiresAt" > NOW()
                   """;
 
         var result = await connection.QuerySingleOrDefaultAsync<RefreshToken>(sql, new { token }, transaction);
