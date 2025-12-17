@@ -53,7 +53,7 @@ public static class DbSeeder
             }
         }
 
-        // Seed an admin user
+        // Seed a merchant
         var merchants = await userManager.GetUsersInRoleAsync(Roles.Merchant);
         if (merchants.Count == 0)
         {
@@ -72,6 +72,8 @@ public static class DbSeeder
             var result = await userManager.CreateAsync(merchant, "Merchant@123"); // secure password
             if (result.Succeeded)
             {
+                await dbContext.Merchants.AddAsync(
+                    new Merchant { BusinessName = "Test Business", UserId = merchant.Id });
                 await userManager.AddToRoleAsync(merchant, Roles.Merchant);
             }
             else
