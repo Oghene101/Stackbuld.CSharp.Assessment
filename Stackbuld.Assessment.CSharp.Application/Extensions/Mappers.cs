@@ -98,9 +98,8 @@ public static class Mappers
             new DateRangeFilter(dto.StartDate, dto.EndDate));
 
     public static GetProductsByMerchantId.Query ToQuery(
-        this Common.Contracts.Product.GetProductsByMerchantIdRequest dto, Guid id)
+        this Common.Contracts.Product.GetProductsByMerchantIdRequest dto)
         => new(
-            id,
             new PaginationFilter(dto.PageNumber, dto.PageSize),
             new DateRangeFilter(dto.StartDate, dto.EndDate));
 
@@ -108,10 +107,10 @@ public static class Mappers
 
     #region To View Model
 
-    public static GetProductByIdResponse ToVm(this Product dto, string merchantName)
+    public static GetProductByIdResponse ToVm(this Product dto, string businessName)
         => new(
             dto.MerchantId,
-            merchantName,
+            businessName,
             dto.Id,
             dto.Name,
             dto.Description,

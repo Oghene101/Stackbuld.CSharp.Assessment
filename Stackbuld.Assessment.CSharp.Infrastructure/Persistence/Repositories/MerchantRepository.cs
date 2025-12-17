@@ -8,14 +8,25 @@ public class MerchantRepository(
     IDbConnection connection,
     IDbTransaction? transaction) : IMerchantRepository
 {
-    public async Task<string?> GetMerchantNameById(Guid id)
+    public async Task<string?> GetMerchantNameByIdAsync(Guid id)
     {
         var sql = """
-                  SELECT "Name" FROM "Merchants" 
+                  SELECT "BusinessName" FROM "Merchants" 
                           WHERE "Id" = @id
                   """;
 
         var result = await connection.ExecuteScalarAsync<string>(sql, new { id }, transaction);
+        return result;
+    }
+
+    public async Task<Guid?> GetMerchantIdByUserIdAsync(Guid userId)
+    {
+        var sql = """
+                  SELECT "Id" FROM "Merchants" 
+                          WHERE "UserId" = @userId
+                  """;
+
+        var result = await connection.ExecuteScalarAsync<Guid>(sql, new { userId }, transaction);
         return result;
     }
 }

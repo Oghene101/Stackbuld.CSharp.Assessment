@@ -11,6 +11,7 @@ public interface IAuthService
 
     string GetSignedInUserId();
     string GetSignedInUserEmail();
+    string GetSignedInMerchantId();
     string GetSignedInUserName();
     Task SendEmailConfirmationAsync(User user, CancellationToken cancellationToken = default);
     Task SendForgotPasswordEmailAsync(User user, CancellationToken cancellationToken = default);

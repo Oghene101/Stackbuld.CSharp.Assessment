@@ -15,7 +15,7 @@ public class MerchantEndpoints : IEndpoint
     {
         var group = app.MapGroup("api/merchant").WithTags("Merchant");
 
-        group.MapGet("products/{id:guid}", GetProductsByMerchantIdAsync)
+        group.MapGet("products", GetProductsByMerchantIdAsync)
             .WithName("GetProductsByMerchant")
             .WithSummary("Get all products belonging to the signed-in merchant")
             .WithDescription(
@@ -27,10 +27,10 @@ public class MerchantEndpoints : IEndpoint
         Task<Results<Ok<ApiResponse<PaginatorVm<IEnumerable<Product.GetProductsResponse>>>>,
             BadRequest<ValidationProblemDetails>>>
         GetProductsByMerchantIdAsync(
-            Guid id, [AsParameters] Product.GetProductsByMerchantIdRequest request,
+            [AsParameters] Product.GetProductsByMerchantIdRequest request,
             ISender sender, CancellationToken cancellationToken)
     {
-        var query = request.ToQuery(id);
+        var query = request.ToQuery();
         var result = await sender.Send(query, cancellationToken);
         var apiResponse = ApiResponse.Success(result.Value);
 

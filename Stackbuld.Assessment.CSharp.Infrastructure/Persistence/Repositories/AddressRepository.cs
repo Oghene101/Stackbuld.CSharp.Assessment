@@ -12,8 +12,8 @@ public class AddressRepository(
     public async Task<IEnumerable<Address>> GetAddressesAsync(Guid kycVerificationId)
     {
         var sql = """
-                  SELECT * FROM Addresses 
-                           WHERE KycVerificationId = @kycVerificationId
+                  SELECT * FROM "Addresses" 
+                           WHERE "KycVerificationId" = @kycVerificationId
                   """;
 
         var result = await connection.QueryAsync<Address>(sql, new { kycVerificationId }, transaction);
@@ -23,9 +23,10 @@ public class AddressRepository(
     public async Task<IEnumerable<Address>> GetMostRecentAddressAsync(Guid kycVerificationId)
     {
         var sql = """
-                  SELECT top (1) * FROM "Addresses" 
+                  SELECT * FROM "Addresses" 
                            WHERE "KycVerificationId" = @kycVerificationId
                            ORDER BY "CreatedAt" DESC
+                           LIMIT 1
                   """;
 
         var result = await connection.QueryAsync<Address>(sql, new { kycVerificationId }, transaction);

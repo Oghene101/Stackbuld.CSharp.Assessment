@@ -7,9 +7,7 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddPresentation(this IServiceCollection services)
     {
-        services.AddOpenApi();
-        //services.AddOpenApi(options => options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
-
+        services.AddOpenApi(options => options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
 

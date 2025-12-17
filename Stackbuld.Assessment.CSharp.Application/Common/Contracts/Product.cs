@@ -6,7 +6,7 @@ public static class Product
 
     public record GetProductByIdResponse(
         Guid MerchantId,
-        string MerchantName,
+        string BusinessName,
         Guid ProductId,
         string ProductName,
         string Description,

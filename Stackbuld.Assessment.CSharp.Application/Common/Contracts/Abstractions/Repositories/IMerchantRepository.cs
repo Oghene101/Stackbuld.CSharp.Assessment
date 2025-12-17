@@ -2,5 +2,6 @@ namespace Stackbuld.Assessment.CSharp.Application.Common.Contracts.Abstractions.
 
 public interface IMerchantRepository
 {
-    Task<string?> GetMerchantNameById(Guid id);
+    Task<string?> GetMerchantNameByIdAsync(Guid id);
+    Task<Guid?> GetMerchantIdByUserIdAsync(Guid userId);
 }

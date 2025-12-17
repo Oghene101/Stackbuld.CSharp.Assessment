@@ -6,6 +6,7 @@ using Stackbuld.Assessment.CSharp.Application.Common.Contracts;
 using Stackbuld.Assessment.CSharp.Application.Common.Contracts.Abstractions;
 using Stackbuld.Assessment.CSharp.Application.Common.Contracts.Abstractions.Mailing;
 using Stackbuld.Assessment.CSharp.Application.Common.Exceptions;
+using Stackbuld.Assessment.CSharp.Domain.Constants;
 using Stackbuld.Assessment.CSharp.Domain.Entities;
 using Stackbuld.Assessment.CSharp.Infrastructure.Configurations;
 
@@ -45,6 +46,15 @@ public class AuthService(
 
     public string GetSignedInUserName() => User?.FindFirstValue(ClaimTypes.Name) ??
                                            throw new InvalidOperationException("JWT missing 'name' claim.");
+
+    public string GetSignedInMerchantId()
+    {
+        if (User is not null && !User.IsInRole(Roles.Merchant))
+            throw new UnauthorizedAccessException("Missing required role for this resource.");
+
+        return User?.FindFirstValue("merchant_id") ??
+               throw new InvalidOperationException("JWT missing 'merchant_id' claim.");
+    }
 
     #endregion
 

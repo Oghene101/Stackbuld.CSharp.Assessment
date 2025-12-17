@@ -21,7 +21,7 @@ public static class GetProductById
             if (product is null)
                 throw ApiException.NotFound(new Error("Product.Error", $"Product with id '{request.Id}' not found"));
 
-            var merchantName = await uOw.MerchantsReadRepository.GetMerchantNameById(product.MerchantId);
+            var merchantName = await uOw.MerchantsReadRepository.GetMerchantNameByIdAsync(product.MerchantId);
 
             var getProductByIdResponse = product.ToVm(merchantName!);
             return Result.Success(getProductByIdResponse);

@@ -7,6 +7,7 @@ using Stackbuld.Assessment.CSharp.Application.Common.Contracts;
 using Stackbuld.Assessment.CSharp.Application.Common.Contracts.Abstractions;
 using Stackbuld.Assessment.CSharp.Application.Common.Contracts.Abstractions.Repositories;
 using Stackbuld.Assessment.CSharp.Application.Common.Exceptions;
+using Stackbuld.Assessment.CSharp.Domain.Constants;
 using Stackbuld.Assessment.CSharp.Domain.Entities;
 using Stackbuld.Assessment.CSharp.Infrastructure.Configurations;
 
@@ -14,7 +15,8 @@ namespace Stackbuld.Assessment.CSharp.Infrastructure.Services;
 
 public class JwtService(
     IOptions<JwtSettings> jwt,
-    IUnitOfWork uOw) : IJwtService
+    IUnitOfWork uOw,
+    IUtilityService utility) : IJwtService
 {
     private readonly JwtSettings _jwt = jwt.Value;
 
@@ -41,6 +43,12 @@ public class JwtService(
             claims.Add(new Claim("sec_stamp", user.SecurityStamp));
         }
 
+        if (roles.Any(x => x == Roles.Merchant))
+        {
+            var merchantId = await uOw.MerchantsReadRepository.GetMerchantIdByUserIdAsync(user.Id);
+            claims.Add(new Claim("merchant_id", merchantId.ToString()!));
+        }
+
         var rsa = RSA.Create();
         rsa.ImportFromPem(_jwt.PrivateKey);
         var creds = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256);
@@ -53,9 +61,10 @@ public class JwtService(
             signingCredentials: creds
         );
 
+        var plainRefreshToken = GenerateRefreshToken();
         var refreshToken = new RefreshToken
         {
-            TokenHash = GenerateRefreshToken(),
+            TokenHash = utility.ComputeSha256Hash(plainRefreshToken),
             ExpiresAt = DateTimeOffset.UtcNow.AddDays(_jwt.RefreshTokenExpireDays),
             UserId = user.Id,
             CreatedBy = $"{user.FirstName} {user.LastName}",
@@ -67,7 +76,7 @@ public class JwtService(
         var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
 
         return new Application.Common.Contracts.Services.Jwt.GenerateTokenResponse(accessToken, _jwt.ExpireMinutes,
-            refreshToken.TokenHash);
+            plainRefreshToken);
     }
 
     private static string GenerateRefreshToken()
