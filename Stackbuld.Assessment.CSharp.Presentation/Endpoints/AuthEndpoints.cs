@@ -24,6 +24,18 @@ public class AuthEndpoints : IEndpoint
             .WithSummary("Register a new merchant")
             .WithDescription("Creates a merchant account with credentials for authentication.")
             .AllowAnonymous();
+
+        group.MapPost("confirm-email", ConfirmEmailAsync)
+            .WithName("ConfirmEmail")
+            .WithSummary("Confirm user email")
+            .WithDescription("Confirms a user's email using the confirmation token.")
+            .AllowAnonymous();
+
+        group.MapPost("sign-in", SignInAsync)
+            .WithName("SignIn")
+            .WithSummary("Authenticate user")
+            .WithDescription("Authenticates a user with their credentials and returns access and refresh tokens.")
+            .AllowAnonymous();
     }
 
 
@@ -44,6 +56,29 @@ public class AuthEndpoints : IEndpoint
     {
         var command = request.ToCommand();
         Guid result = await sender.Send(command, cancellationToken);
+        var apiResponse = ApiResponse.Success(result);
+
+        return TypedResults.Ok(apiResponse);
+    }
+
+    private static async Task<Results<Ok<ApiResponse>, BadRequest<ValidationProblemDetails>>> ConfirmEmailAsync(
+        Auth.ConfirmEmailRequest request,
+        ISender sender, CancellationToken cancellationToken)
+    {
+        var command = request.ToCommand();
+        string result = await sender.Send(command, cancellationToken);
+        var apiResponse = ApiResponse.Success(message: result);
+
+        return TypedResults.Ok(apiResponse);
+    }
+
+    private static async Task<Results<Ok<ApiResponse<Auth.SignInResponse>>, BadRequest<ValidationProblemDetails>>>
+        SignInAsync(
+            Auth.SignInRequest request,
+            ISender sender, CancellationToken cancellationToken)
+    {
+        var command = request.ToCommand();
+        Auth.SignInResponse result = await sender.Send(command, cancellationToken);
         var apiResponse = ApiResponse.Success(result);
 
         return TypedResults.Ok(apiResponse);

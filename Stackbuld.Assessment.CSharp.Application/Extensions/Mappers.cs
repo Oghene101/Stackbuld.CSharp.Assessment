@@ -71,6 +71,12 @@ public static class Mappers
     public static SignUpMerchant.Command ToCommand(this Auth.SignUpMerchantRequest dto)
         => new(dto.FirstName, dto.LastName, dto.Email, dto.BusinessName, dto.Password);
 
+    public static ConfirmEmail.Command ToCommand(this Auth.ConfirmEmailRequest dto)
+        => new(dto.Email, dto.Token);
+
+    public static SignIn.Command ToCommand(this Auth.SignInRequest dto)
+        => new(dto.Email, dto.Password);
+
     public static CreateProduct.Command ToCommand(this CreateProductRequest dto)
         => new(dto.Name, dto.Description, dto.Price, dto.StockQuantity);
 
