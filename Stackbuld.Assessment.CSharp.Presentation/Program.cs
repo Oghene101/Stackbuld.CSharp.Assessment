@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Scalar.AspNetCore;
 using Stackbuld.Assessment.CSharp.Application.Extensions;
 using Stackbuld.Assessment.CSharp.Infrastructure.Extensions;
+using Stackbuld.Assessment.CSharp.Infrastructure.Persistence;
 using Stackbuld.Assessment.CSharp.Presentation.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,11 @@ app.UseHsts();
 app.UseHttpsRedirection();
 app.UseMiddleware<TimingMiddleware>();
 app.UseExceptionHandler();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapEndpoints();
+
+await using var scope = app.Services.CreateAsyncScope();
+await DbSeeder.SeedAsync(scope.ServiceProvider);
 
 app.Run();
