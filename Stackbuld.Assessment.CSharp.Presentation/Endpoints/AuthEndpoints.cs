@@ -42,6 +42,12 @@ public class AuthEndpoints : IEndpoint
             .WithSummary("Refresh access token")
             .WithDescription("Exchanges a valid refresh token for a new access token a new refresh token.")
             .AllowAnonymous();
+
+        group.MapPost("change-password", ChangePasswordAsync)
+            .WithName("ChangePassword")
+            .WithSummary("Change user password")
+            .WithDescription("Allows an authenticated user to change their password.")
+            .RequireAuthorization();
     }
 
 
@@ -99,6 +105,18 @@ public class AuthEndpoints : IEndpoint
         var command = request.ToCommand();
         var result = await sender.Send(command, cancellationToken);
         var apiResponse = ApiResponse.Success(result.Value);
+
+        return TypedResults.Ok(apiResponse);
+    }
+
+    private static async Task<Results<Ok<ApiResponse>, BadRequest<ValidationProblemDetails>>>
+        ChangePasswordAsync(
+            Auth.ChangePasswordRequest request,
+            ISender sender, CancellationToken cancellationToken)
+    {
+        var command = request.ToCommand();
+        string result = await sender.Send(command, cancellationToken);
+        var apiResponse = ApiResponse.Success(message: result);
 
         return TypedResults.Ok(apiResponse);
     }
