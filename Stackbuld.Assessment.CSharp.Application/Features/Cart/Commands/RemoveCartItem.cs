@@ -17,7 +17,7 @@ public static class RemoveCartItem
             await uOw.CartItemsWriteRepository.RemoveAsync(request.Id, cancellationToken);
             await uOw.SaveChangesAsync(cancellationToken);
 
-            throw new NotImplementedException();
+            return Result.Success(request.Id);
         }
     }
 }

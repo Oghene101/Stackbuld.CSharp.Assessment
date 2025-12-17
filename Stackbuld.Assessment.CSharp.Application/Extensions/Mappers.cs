@@ -13,6 +13,7 @@ using GetProductsRequest = Stackbuld.Assessment.CSharp.Application.Common.Contra
 using GetProductByIdResponse = Stackbuld.Assessment.CSharp.Application.Common.Contracts.Product.GetProductByIdResponse;
 using GetProductsResponse = Stackbuld.Assessment.CSharp.Application.Common.Contracts.Product.GetProductsResponse;
 using Product = Stackbuld.Assessment.CSharp.Domain.Entities.Product;
+using RefreshToken = Stackbuld.Assessment.CSharp.Application.Features.Auth.Commands.RefreshToken;
 
 namespace Stackbuld.Assessment.CSharp.Application.Extensions;
 
@@ -76,6 +77,9 @@ public static class Mappers
 
     public static SignIn.Command ToCommand(this Auth.SignInRequest dto)
         => new(dto.Email, dto.Password);
+
+    public static RefreshToken.Command ToCommand(this Auth.RefreshTokenRequest dto)
+        => new(dto.AccessToken, dto.RefreshToken);
 
     public static CreateProduct.Command ToCommand(this CreateProductRequest dto)
         => new(dto.Name, dto.Description, dto.Price, dto.StockQuantity);

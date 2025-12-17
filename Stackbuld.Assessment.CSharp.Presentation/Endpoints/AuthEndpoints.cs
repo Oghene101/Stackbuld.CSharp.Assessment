@@ -36,6 +36,12 @@ public class AuthEndpoints : IEndpoint
             .WithSummary("Authenticate user")
             .WithDescription("Authenticates a user with their credentials and returns access and refresh tokens.")
             .AllowAnonymous();
+
+        group.MapPost("refresh-token", RefreshTokenAsync)
+            .WithName("RefreshToken")
+            .WithSummary("Refresh access token")
+            .WithDescription("Exchanges a valid refresh token for a new access token a new refresh token.")
+            .AllowAnonymous();
     }
 
 
@@ -80,6 +86,19 @@ public class AuthEndpoints : IEndpoint
         var command = request.ToCommand();
         Auth.SignInResponse result = await sender.Send(command, cancellationToken);
         var apiResponse = ApiResponse.Success(result);
+
+        return TypedResults.Ok(apiResponse);
+    }
+
+    private static async Task<Results<Ok<ApiResponse<Services.Jwt.GenerateTokenResponse>>,
+            BadRequest<ValidationProblemDetails>>>
+        RefreshTokenAsync(
+            Auth.RefreshTokenRequest request,
+            ISender sender, CancellationToken cancellationToken)
+    {
+        var command = request.ToCommand();
+        var result = await sender.Send(command, cancellationToken);
+        var apiResponse = ApiResponse.Success(result.Value);
 
         return TypedResults.Ok(apiResponse);
     }

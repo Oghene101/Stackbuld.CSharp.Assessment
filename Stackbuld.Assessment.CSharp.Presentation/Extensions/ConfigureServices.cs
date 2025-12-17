@@ -31,5 +31,3 @@ public static class EndpointRegistrationExtensions
         }
     }
 }
-
-//todo: implement background service to ping application
